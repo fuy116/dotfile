@@ -7,8 +7,12 @@
 ```
 dotfile/
 ├── aerospace/
-│   └── .aerospace.toml    → ~/.aerospace.toml
-└── install.sh             # 一鍵建立 symlink
+│   └── .aerospace.toml       → ~/.aerospace.toml
+├── oh-my-posh/
+│   └── theme.omp.json        → ~/.config/oh-my-posh/theme.omp.json
+├── ghostty/
+│   └── config                → ~/.config/ghostty/config
+└── install.sh
 ```
 
 ## 安裝（新機 / clone 後）
@@ -19,16 +23,21 @@ cd ~/dotfile
 ./install.sh
 ```
 
-AeroSpace 改完設定後：`Alt+Shift+R` reload，或 `aerospace reload-config`。
+## 各工具 reload
 
-## Workspace 速查
+| 工具 | 生效方式 |
+|------|----------|
+| AeroSpace | `Alt+Shift+R` 或 `aerospace reload-config` |
+| Ghostty | 重開視窗 / 新開 tab |
+| oh-my-posh | `exec zsh` 或新開 terminal |
+
+## AeroSpace Workspace 速查
 
 | WS | 用途 | App |
 |----|------|-----|
 | 1 | 瀏覽 | Safari, Dia |
 | 2 | 筆記 | Heptabase |
 | 3 | 開發 | Cursor, cmux |
-| 4 | 備考 | Anki |
 | 5 | VS Code | Visual Studio Code |
 | 6 | 聊天 | Discord, LINE |
 | 7 | 雜項 | Spotify, Calendar |
