@@ -1,0 +1,324 @@
+# SketchyBar — 仿 FelixKratz / simple-bar 風格
+# 重載：brew services restart sketchybar
+
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+
+##### Bar #####
+
+sketchybar --bar \
+  position=top \
+  height=32 \
+  y_offset=8 \
+  margin=10 \
+  corner_radius=9 \
+  blur_radius=0 \
+  color=0xe6f2f2f4 \
+  border_width=1 \
+  border_color=0x33000000 \
+  shadow=off \
+  padding_left=10 \
+  padding_right=10 \
+  topmost=window \
+  sticky=on
+
+##### Defaults #####
+
+default=(
+  padding_left=3
+  padding_right=3
+  icon.font="JetBrainsMono Nerd Font:Bold:14.0"
+  label.font="JetBrainsMono Nerd Font:Bold:12.0"
+  icon.color=0xff1c1c1e
+  label.color=0xff2c2c2e
+  icon.padding_left=2
+  icon.padding_right=2
+  label.padding_left=2
+  label.padding_right=2
+)
+sketchybar --default "${default[@]}"
+
+##### Apple + Popup #####
+
+sketchybar --add item apple left \
+  --set apple \
+        icon= \
+        label.drawing=off \
+        popup.background.corner_radius=8 \
+        popup.background.color=0xee1e1e2e \
+        popup.background.border_width=1 \
+        popup.background.border_color=0x55ffffff \
+        popup.height=26 \
+        click_script="sketchybar --set apple popup.drawing=toggle"
+
+sketchybar --add item apple.prefs popup.apple \
+  --set apple.prefs icon= label="Preferences" \
+        click_script="open -a 'System Settings'; sketchybar --set apple popup.drawing=off"
+
+sketchybar --add item apple.activity popup.apple \
+  --set apple.activity icon= label="Activity" \
+        click_script="open -a 'Activity Monitor'; sketchybar --set apple popup.drawing=off"
+
+sketchybar --add item apple.lock popup.apple \
+  --set apple.lock icon= label="Lock Screen" \
+        click_script="pmset displaysleepnow; sketchybar --set apple popup.drawing=off"
+
+##### Spaces — AeroSpace workspaces #####
+
+sketchybar --add event aerospace_workspace_change
+
+for sid in $(aerospace list-workspaces --all); do
+  sketchybar --add item space."$sid" left \
+    --set space."$sid" \
+          icon="$sid" \
+          icon.font="JetBrainsMono Nerd Font:Bold:13.0" \
+          icon.padding_left=6 \
+          icon.padding_right=4 \
+          label.padding_right=8 \
+          label.drawing=off \
+          drawing=off \
+          update_freq=20 \
+          click_script="aerospace workspace $sid" \
+          script="$PLUGIN_DIR/aerospace.sh $sid" \
+    --subscribe space."$sid" aerospace_workspace_change front_app_switched
+
+  sketchybar --add bracket space.bracket."$sid" space."$sid" \
+    --set space.bracket."$sid" \
+          background.corner_radius=6 \
+          background.height=24 \
+          background.drawing=off
+done
+
+##### Chevron + Front App #####
+
+sketchybar --add item chevron left \
+  --set chevron icon= label.drawing=off icon.color=0xff636366
+
+sketchybar --add item front_app left \
+  --set front_app \
+        script="$PLUGIN_DIR/front_app.sh" \
+        icon.padding_left=4 \
+        label.padding_right=8 \
+  --subscribe front_app front_app_switched
+
+sketchybar --add bracket app_group chevron front_app \
+  --set app_group \
+        background.color=0x1f000000 \
+        background.corner_radius=6 \
+        background.height=24
+
+##### Spotify hover player（Felix 水平卡片：封面左、右側置中）#####
+
+SPOTIFY_EVENT="com.spotify.client.PlaybackStateChanged"
+SP_GREEN=0xff1DB954
+SP_TEXT=0xff2c2c2e
+SP_DIM=0xff636366
+SP_SUB=0xff98989d
+SP_FONT="JetBrainsMono Nerd Font"
+SP_POPUP_BG=0xe6f2f2f4
+SP_POPUP_BORDER=0x33000000
+SP_TEXT_W=115
+
+sketchybar --add event spotify_change "$SPOTIFY_EVENT"
+
+sketchybar --add item spotify left \
+  --set spotify \
+        icon=󰓇 \
+        icon.color=$SP_GREEN \
+        label.max_chars=24 \
+        scroll_texts=on \
+        label.scroll_duration=80 \
+        drawing=off \
+        popup.horizontal=on \
+        popup.align=left \
+        popup.height=135 \
+        popup.background.corner_radius=12 \
+        popup.background.color=$SP_POPUP_BG \
+        popup.background.border_width=1 \
+        popup.background.border_color=$SP_POPUP_BORDER \
+        script="$PLUGIN_DIR/spotify.sh" \
+  --subscribe spotify mouse.entered mouse.exited mouse.exited.global spotify_change
+
+# 左：封面固定
+sketchybar --add item spotify.cover popup.spotify \
+  --set spotify.cover \
+        icon.drawing=off \
+        label.drawing=off \
+        padding_left=14 \
+        padding_right=8 \
+        background.image.scale=0.20 \
+        background.image.corner_radius=8 \
+        background.image.drawing=on \
+        background.drawing=on \
+        background.color=0x00000000 \
+        click_script="open -a 'Spotify'; sketchybar --set spotify popup.drawing=off"
+
+# 右：文字置中（width=0 疊在封面右側）
+sketchybar --add item spotify.title popup.spotify \
+  --set spotify.title \
+        icon.drawing=off \
+        width=0 \
+        label.font="$SP_FONT:Heavy:14.0" \
+        label.color=$SP_TEXT \
+        label.max_chars=18 \
+        label.width=$SP_TEXT_W \
+        label.align=center \
+        y_offset=50
+
+sketchybar --add item spotify.artist popup.spotify \
+  --set spotify.artist \
+        icon.drawing=off \
+        width=0 \
+        label.font="$SP_FONT:Bold:11.0" \
+        label.color=$SP_DIM \
+        label.max_chars=20 \
+        label.width=$SP_TEXT_W \
+        label.align=center \
+        y_offset=30
+
+sketchybar --add item spotify.album popup.spotify \
+  --set spotify.album \
+        icon.drawing=off \
+        width=0 \
+        label.font="$SP_FONT:Bold:11.0" \
+        label.color=$SP_SUB \
+        label.max_chars=20 \
+        label.width=$SP_TEXT_W \
+        label.align=center \
+        y_offset=10
+
+# 右：控制鍵置中（width=0 疊在同一欄，不往右撐開）
+sketchybar --add item spotify.back popup.spotify \
+  --set spotify.back \
+        icon=󰒮 \
+        icon.font="$SP_FONT:Bold:15.0" \
+        icon.color=$SP_TEXT \
+        icon.padding_left=24 \
+        label.drawing=off \
+        width=0 \
+        y_offset=-42 \
+        script="$PLUGIN_DIR/spotify.sh" \
+  --subscribe spotify.back mouse.clicked
+
+sketchybar --add item spotify.play popup.spotify \
+  --set spotify.play \
+        icon=󰏤 \
+        icon.font="$SP_FONT:Bold:17.0" \
+        icon.color=$SP_GREEN \
+        icon.padding_left=48 \
+        label.drawing=off \
+        width=0 \
+        y_offset=-42 \
+        script="$PLUGIN_DIR/spotify.sh" \
+  --subscribe spotify.play mouse.clicked spotify_change
+
+sketchybar --add item spotify.next popup.spotify \
+  --set spotify.next \
+        icon=󰒭 \
+        icon.font="$SP_FONT:Bold:15.0" \
+        icon.color=$SP_TEXT \
+        icon.padding_left=72 \
+        label.drawing=off \
+        width=0 \
+        y_offset=-42 \
+        script="$PLUGIN_DIR/spotify.sh" \
+  --subscribe spotify.next mouse.clicked
+
+# 撐開右側文字區寬度（放最後，避免中空）
+sketchybar --add item spotify.gap popup.spotify \
+  --set spotify.gap \
+        width=$SP_TEXT_W \
+        icon.drawing=off \
+        label.drawing=off \
+        background.drawing=off
+
+sketchybar --add item spotify.spacer popup.spotify \
+  --set spotify.spacer width=5 icon.drawing=off label.drawing=off
+
+sketchybar --add bracket spotify.controls spotify.back spotify.play spotify.next \
+  --set spotify.controls \
+        background.drawing=on \
+        background.color=0x1f000000 \
+        background.corner_radius=10 \
+        y_offset=-42
+
+##### Center #####
+
+sketchybar --add item center_icon center \
+  --set center_icon icon= label.drawing=off icon.font="JetBrainsMono Nerd Font:Bold:15.0"
+
+##### Clock（最右邊：先加 = 最右）#####
+
+sketchybar --add item clock right \
+  --set clock \
+        icon=󰥔 \
+        icon.font="JetBrainsMono Nerd Font:Bold:13.0" \
+        icon.color=0xff7d93a6 \
+        icon.padding_left=8 \
+        icon.padding_right=4 \
+        update_freq=10 \
+        label.font="JetBrainsMono Nerd Font:Bold:12.0" \
+        label.padding_left=0 \
+        script="$PLUGIN_DIR/clock.sh"
+
+##### Right: Claude Code usage #####
+
+sketchybar --add item claude_usage right \
+  --set claude_usage \
+        icon=":claude:" \
+        icon.font="sketchybar-app-font:Regular:14.0" \
+        icon.color=0xffDA7756 \
+        icon.padding_right=4 \
+        update_freq=60 \
+        script="$PLUGIN_DIR/claude_usage.sh"
+
+##### Right: Status pill #####
+
+sketchybar --add item volume right \
+  --set volume icon.color=0xff84a59d script="$PLUGIN_DIR/volume.sh" \
+  --subscribe volume volume_change
+
+sketchybar --add item battery right \
+  --set battery update_freq=120 script="$PLUGIN_DIR/battery.sh" \
+  --subscribe battery system_woke power_source_change
+
+# （移除原本的 status_group 藥丸背景，淺白底上會糊成灰塊）
+
+##### Right: Anki 備考 #####
+
+sketchybar --add item anki right \
+  --set anki \
+        icon=󰘸 \
+        icon.font="JetBrainsMono Nerd Font:Bold:14.0" \
+        icon.color=0xff9a8db0 \
+        icon.padding_right=4 \
+        label.font="JetBrainsMono Nerd Font:Bold:11.0" \
+        drawing=off \
+        update_freq=180 \
+        click_script="open -a Anki" \
+        script="$PLUGIN_DIR/anki.sh" \
+  --subscribe anki front_app_switched
+
+##### Right: 倒數日（資工所考試 2027/02/01）#####
+
+sketchybar --add item countdown right \
+  --set countdown \
+        icon=󰈻 \
+        icon.font="JetBrainsMono Nerd Font:Bold:13.0" \
+        icon.color=0xffc28a7c \
+        icon.padding_left=8 \
+        icon.padding_right=4 \
+        label.font="JetBrainsMono Nerd Font:Bold:12.0" \
+        update_freq=3600 \
+        script="$PLUGIN_DIR/countdown.sh"
+
+sketchybar --update
+sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE="$(aerospace list-workspaces --focused)"
+sketchybar --trigger spotify_change
+
+# 初始化前景 App 圖示
+FRONT_APP="$(osascript -e 'tell application "System Events" to name of first process whose frontmost is true' 2>/dev/null)"
+sketchybar --trigger front_app_switched INFO="$FRONT_APP"
+
+# 初始化音量（reload 後不會空白）
+VOL="$(osascript -e 'output volume of (get volume settings)' 2>/dev/null)"
+sketchybar --trigger volume_change INFO="$VOL"

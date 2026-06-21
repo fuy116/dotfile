@@ -12,6 +12,9 @@ dotfile/
 │   └── theme.omp.json        → ~/.config/oh-my-posh/theme.omp.json
 ├── ghostty/
 │   └── config                → ~/.config/ghostty/config
+├── SketchyBar/
+│   ├── sketchybarrc          → ~/.config/sketchybar/sketchybarrc
+│   └── plugins/              → ~/.config/sketchybar/plugins/
 └── install.sh
 ```
 
@@ -30,6 +33,7 @@ cd ~/dotfile
 | AeroSpace | `Alt+Shift+R` 或 `aerospace reload-config` |
 | Ghostty | 重開視窗 / 新開 tab |
 | oh-my-posh | `exec zsh` 或新開 terminal |
+| SketchyBar | `brew services restart sketchybar` |
 
 ## AeroSpace Workspace 速查
 
