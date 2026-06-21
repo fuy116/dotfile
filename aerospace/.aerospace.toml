@@ -1,0 +1,169 @@
+# AeroSpace config
+# Docs: https://nikitabobko.github.io/AeroSpace/guide
+
+# 開機自動啟動
+start-at-login = true
+
+# 視窗間留白（像素）
+gaps.inner.horizontal = 8
+gaps.inner.vertical = 8
+gaps.outer.left = 8
+gaps.outer.bottom = 8
+gaps.outer.top = 8
+gaps.outer.right = 8
+
+# 預設排列方式
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+# 滑鼠移到哪個 monitor 就 focus 該 monitor
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+
+[mode.main.binding]
+
+# 開終端機
+alt-enter = 'exec-and-forget open -a Terminal'
+
+# Focus 移動
+alt-h = 'focus left'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus right'
+
+# 移動視窗
+alt-shift-h = 'move left'
+alt-shift-j = 'move down'
+alt-shift-k = 'move up'
+alt-shift-l = 'move right'
+
+# 調整大小
+alt-minus = 'resize smart -50'
+alt-equal = 'resize smart +50'
+
+# 切換 layout
+alt-slash = 'layout tiles horizontal vertical'
+alt-comma = 'layout accordion horizontal vertical'
+
+# 全螢幕 / 浮動
+alt-f = 'fullscreen'
+alt-shift-space = 'layout floating tiling'
+
+# Workspace 切換
+alt-1 = 'workspace 1'
+alt-2 = 'workspace 2'
+alt-3 = 'workspace 3'
+alt-4 = 'workspace 4'
+alt-5 = 'workspace 5'
+alt-6 = 'workspace 6'
+alt-7 = 'workspace 7'
+alt-8 = 'workspace 8'
+alt-9 = 'workspace 9'
+
+# 把視窗移到指定 workspace
+alt-shift-1 = 'move-node-to-workspace 1'
+alt-shift-2 = 'move-node-to-workspace 2'
+alt-shift-3 = 'move-node-to-workspace 3'
+alt-shift-4 = 'move-node-to-workspace 4'
+alt-shift-5 = 'move-node-to-workspace 5'
+alt-shift-6 = 'move-node-to-workspace 6'
+alt-shift-7 = 'move-node-to-workspace 7'
+alt-shift-8 = 'move-node-to-workspace 8'
+alt-shift-9 = 'move-node-to-workspace 9'
+
+# 切換上一個 workspace
+alt-tab = 'workspace-back-and-forth'
+
+# 把當前視窗丟到另一台螢幕（雙螢幕）
+alt-shift-tab = 'move-node-to-monitor --wrap-around next'
+
+# 重新整理設定檔
+alt-shift-r = 'reload-config'
+
+# Service mode（用來退出/強制離開卡住的視窗等）
+alt-shift-semicolon = 'mode service'
+
+[mode.service.binding]
+esc = ['reload-config', 'mode main']
+r = ['flatten-workspace-tree', 'mode main']
+f = ['layout floating tiling', 'mode main']
+backspace = ['close-all-windows-but-current', 'mode main']
+
+# ── App 自動分配 workspace ──────────────────────────────
+# workspace 1：瀏覽
+[[on-window-detected]]
+if.app-id = 'com.apple.Safari'
+run = 'move-node-to-workspace 1'
+
+[[on-window-detected]]
+if.app-id = 'company.thebrowser.dia'
+run = 'move-node-to-workspace 1'
+
+# workspace 2：筆記
+[[on-window-detected]]
+if.app-id = 'app.projectmeta.projectmeta'
+run = 'move-node-to-workspace 2'
+
+# workspace 3：開發
+[[on-window-detected]]
+if.app-id = 'com.todesktop.230313mzl4w4u92'
+run = 'move-node-to-workspace 3'
+
+[[on-window-detected]]
+if.app-id = 'com.cmuxterm.app'
+run = 'move-node-to-workspace 3'
+
+# workspace 4：備考
+[[on-window-detected]]
+if.app-id = 'net.ankiweb.launcher'
+run = 'move-node-to-workspace 4'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.Safari.WebApp.AB01DF84-63E3-47D7-BE6F-69D2E65D225D'
+run = 'move-node-to-workspace 4'
+
+# workspace 5：VS Code
+[[on-window-detected]]
+if.app-id = 'com.microsoft.VSCode'
+run = 'move-node-to-workspace 5'
+
+# workspace 6：聊天（Discord / LINE）
+[[on-window-detected]]
+if.app-id = 'com.hnc.Discord'
+run = 'move-node-to-workspace 6'
+
+[[on-window-detected]]
+if.app-id = 'jp.naver.line.mac'
+run = 'move-node-to-workspace 6'
+
+# workspace 7：雜項
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = 'move-node-to-workspace 7'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.iCal'
+run = 'move-node-to-workspace 7'
+
+# ── 永久浮動：小工具視窗不被 tiling 接管 ──────────────────
+[[on-window-detected]]
+if.app-id = 'com.apple.calculator'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = 'layout floating'
+
+# ── 雙螢幕：workspace 綁定螢幕 ──────────────────────────
+# MSI（主，左）：瀏覽 / 筆記 / 開發 / VS Code
+# TS35505（右）：備考 / 雜項 / 聊天
+# 陣列 = 依序匹配：外接螢幕不在時 fallback 到 main（筆電單螢幕）
+[workspace-to-monitor-force-assignment]
+1 = ['MSI MP275Q', 'main']
+2 = ['MSI MP275Q', 'main']
+3 = ['MSI MP275Q', 'main']
+5 = ['MSI MP275Q', 'main']
+4 = ['TS35505', 'main']
+7 = ['TS35505', 'main']
+6 = ['TS35505', 'main']
+8 = ['TS35505', 'main']
+9 = ['TS35505', 'main']
